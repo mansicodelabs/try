@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>TAL</title>
+<style>
+:root{
+  --bg:#ffffff; --ink:#1c1a17; --line:#e9e6df; --paper:#faf9f6;
+  --accent:#a3673e;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  background:var(--bg); color:var(--ink);
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+img,svg{display:block;max-width:100%}
+
+/* ---------- top nav ---------- */
+header{
+  position:fixed; top:env(safe-area-inset-top,0px); left:0; right:0; z-index:50;
+  display:flex; align-items:center; justify-content:space-between;
+  padding:22px 32px; mix-blend-mode:difference;
+}
+.wordmark{font-size:20px; font-weight:700; letter-spacing:0.08em; color:#fff}
+.wordmark span{color:#fff}
+nav.links{display:flex; gap:28px; font-size:14px; color:#fff}
+
+/* ---------- hero: sliding strip ---------- */
+.hero{position:relative; width:100%; height:78vh; min-height:440px; overflow:hidden; background:var(--ink)}
+.marquee{display:flex; width:max-content; height:100%; animation:slide 34s linear infinite}
+.hero:hover .marquee{animation-play-state:paused}
+@keyframes slide{ from{transform:translateX(0)} to{transform:translateX(-50%)} }
+.slide{ height:100%; width:46vw; min-width:340px; flex:none; display:flex; align-items:center; justify-content:center; border-right:1px solid rgba(255,255,255,0.08); }
+.slide svg{width:62%; height:62%}
+.hero-caption{
+  position:absolute; left:32px; bottom:28px; color:#fff; z-index:5;
+  font-size:15px; max-width:320px; line-height:1.5; opacity:0.85;
+}
+
+/* ---------- collection ---------- */
+main{max-width:1180px; margin:0 auto; padding:64px 32px 120px}
+.collection-head{display:flex; align-items:baseline; justify-content:space-between; margin-bottom:36px; gap:16px; flex-wrap:wrap}
+.collection-head h1{font-size:28px; font-weight:600; letter-spacing:-0.01em}
+.collection-head p{font-size:14px; color:#6b665e; max-width:360px}
+
+.grid{display:grid; grid-template-columns:repeat(3,1fr); gap:1px; background:var(--line); border:1px solid var(--line)}
+@media (max-width:860px){ .grid{grid-template-columns:repeat(2,1fr)} }
+@media (max-width:560px){ .grid{grid-template-columns:1fr} }
+
+.card{background:var(--paper); padding:26px 22px 22px; display:block; cursor:pointer; transition:background .25s ease}
+.card:hover{background:#fff}
+.card-imgs{position:relative; height:170px; display:flex; align-items:center; justify-content:center}
+.card-imgs .view-a, .card-imgs .view-b{position:absolute; inset:0; display:flex; align-items:center; justify-content:center; transition:opacity .35s ease, transform .35s ease}
+.card-imgs .view-b{opacity:0; transform:rotateY(0deg) scale(.98)}
+.card:hover .view-a{opacity:0}
+.card:hover .view-b{opacity:1}
+.card-imgs svg{width:64%}
+.card-name{margin-top:18px; font-size:15px; font-weight:600}
+.card-price{margin-top:4px; font-size:14px; color:#6b665e}
+
+/* ---------- detail page ---------- */
+.detail{display:none; max-width:1000px; margin:0 auto; padding:120px 32px 100px}
+.detail.active{display:block}
+.back{display:inline-block; font-size:13px; color:#6b665e; margin-bottom:28px}
+.detail-grid{display:grid; grid-template-columns:1.1fr 0.9fr; gap:56px}
+@media (max-width:760px){ .detail-grid{grid-template-columns:1fr} }
+.detail-imgs{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.detail-imgs .box{background:var(--paper); border:1px solid var(--line); display:flex; align-items:center; justify-content:center; aspect-ratio:1/1}
+.detail-imgs svg{width:58%}
+.detail-info h2{font-size:26px; font-weight:600; margin-bottom:6px}
+.detail-price{font-size:16px; color:#6b665e; margin-bottom:26px}
+.option{border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:18px 0; margin-bottom:26px}
+.option label{display:flex; align-items:flex-start; gap:12px; cursor:pointer; font-size:14px; line-height:1.5}
+.option input{margin-top:3px}
+.rx-fields{display:none; margin-top:16px; grid-template-columns:1fr 1fr; gap:12px}
+.rx-fields.show{display:grid}
+.rx-fields input{width:100%; padding:9px 10px; border:1px solid var(--line); font-size:13px; background:#fff}
+.rx-fields input::placeholder{color:#a49f95}
+.total-row{display:flex; justify-content:space-between; align-items:center; font-size:15px; margin-bottom:22px}
+.total-row strong{font-size:19px}
+.add-btn{width:100%; padding:15px; background:var(--ink); color:#fff; border:none; font-size:14px; font-weight:600; cursor:pointer; letter-spacing:.02em}
+.add-btn:hover{background:var(--accent)}
+.confirm{margin-top:14px; font-size:13px; color:#6b665e; display:none}
+
+footer{border-top:1px solid var(--line); padding:32px; text-align:center; font-size:13px}
+footer p{color:#9a958b}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wordmark">TAL</div>
+  <nav class="links"><a href="#" onclick="showList();return false;">Shop</a></nav>
+</header>
+
+<!-- ===== LIST VIEW ===== -->
+<div id="listView">
+  <div class="hero">
+    <div class="marquee" id="marquee"></div>
+    <div class="hero-caption">Frames, made simple. Every pair ships ready — add a prescription in two clicks.</div>
+  </div>
+
+  <main>
+    <div class="collection-head">
+      <h1>The collection</h1>
+      <p>Six frames, one price. Choose a pair, then decide if you need lenses.</p>
+    </div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<!-- ===== DETAIL VIEW ===== -->
+<div class="detail" id="detailView">
+  <a href="#" class="back" onclick="showList();return false;">&larr; Back to collection</a>
+  <div class="detail-grid" id="detailContent"></div>
+</div>
+
+<footer><p>TAL — frames &amp; lenses, together.</p></footer>
+
+<script>
+const FRAME_PRICE = 30;
+const LENS_PRICE = 50;
+
+const products = [
+  { id:1, name:"Ora",  shape:"round",  color:"#8b6f47" },
+  { id:2, name:"Nova",  shape:"square", color:"#2b2b2b" },
+  { id:3, name:"Iris",  shape:"cateye", color:"#c97b84" },
+  { id:4, name:"Vale",  shape:"rect",   color:"#c9a86a" },
+  { id:5, name:"Sol",   shape:"round",  color:"#b8935f" },
+  { id:6, name:"Rue",   shape:"square", color:"#6b7355" },
+];
+
+function lensShape(shape){
+  // returns path-ish geometry per shape, centered in 0..200 box
+  if(shape==="round") return {tag:"circle", a:{cx:58,cy:100,r:38}, b:{cx:142,cy:100,r:38}};
+  if(shape==="square") return {tag:"rect", a:{x:26,y:68,width:64,height:64,rx:6}, b:{x:110,y:68,width:64,height:64,rx:6}};
+  if(shape==="cateye") return {tag:"path", d:[
+    "M22,100 C22,72 46,64 60,68 C78,74 84,96 78,116 C72,134 40,138 26,120 Z",
+    "M178,100 C178,72 154,64 140,68 C122,74 116,96 122,116 C128,134 160,138 174,120 Z"
+  ]};
+  return {tag:"rect", a:{x:22,y:74,width:70,height:52,rx:4}, b:{x:108,y:74,width:70,height:52,rx:4}}; // rect
+}
+
+function glassesSVG(p, angled){
+  const g = lensShape(p.shape);
+  const skew = angled ? `rotateY(18deg) skewX(-3deg)` : "";
+  let lenses = "";
+  if(g.tag==="circle"){
+    lenses = `<circle cx="${g.a.cx}" cy="${g.a.cy}" r="${g.a.r}" fill="none" stroke="${p.color}" stroke-width="7"/>
+               <circle cx="${g.b.cx}" cy="${g.b.cy}" r="${g.b.r}" fill="none" stroke="${p.color}" stroke-width="7"/>`;
+  } else if(g.tag==="rect"){
+    lenses = `<rect x="${g.a.x}" y="${g.a.y}" width="${g.a.width}" height="${g.a.height}" rx="${g.a.rx}" fill="none" stroke="${p.color}" stroke-width="7"/>
+               <rect x="${g.b.x}" y="${g.b.y}" width="${g.b.width}" height="${g.b.height}" rx="${g.b.rx}" fill="none" stroke="${p.color}" stroke-width="7"/>`;
+  } else {
+    lenses = `<path d="${g.d[0]}" fill="none" stroke="${p.color}" stroke-width="7"/>
+               <path d="${g.d[1]}" fill="none" stroke="${p.color}" stroke-width="7"/>`;
+  }
+  return `<svg viewBox="0 0 200 160" style="transform:${skew}">
+      <line x1="96" y1="98" x2="104" y2="98" stroke="${p.color}" stroke-width="6"/>
+      <line x1="10" y1="86" x2="26" y2="92" stroke="${p.color}" stroke-width="6" stroke-linecap="round"/>
+      <line x1="190" y1="86" x2="174" y2="92" stroke="${p.color}" stroke-width="6" stroke-linecap="round"/>
+      ${lenses}
+    </svg>`;
+}
+
+// hero marquee (duplicated for seamless loop)
+const marquee = document.getElementById("marquee");
+const heroItems = [...products, ...products];
+marquee.innerHTML = heroItems.map(p => `<div class="slide">${glassesSVG(p,false)}</div>`).join("");
+
+// grid
+const grid = document.getElementById("grid");
+grid.innerHTML = products.map(p => `
+  <a class="card" target="_blank" href="#p=${p.id}">
+    <div class="card-imgs">
+      <div class="view-a">${glassesSVG(p,false)}</div>
+      <div class="view-b">${glassesSVG(p,true)}</div>
+    </div>
+    <div class="card-name">${p.name}</div>
+    <div class="card-price">$${FRAME_PRICE} CAD</div>
+  </a>
+`).join("");
+
+function renderDetail(id){
+  const p = products.find(x => x.id === id);
+  if(!p) return;
+  document.getElementById("detailContent").innerHTML = `
+    <div class="detail-imgs">
+      <div class="box">${glassesSVG(p,false)}</div>
+      <div class="box">${glassesSVG(p,true)}</div>
+    </div>
+    <div class="detail-info">
+      <h2>${p.name}</h2>
+      <div class="detail-price">$${FRAME_PRICE} CAD</div>
+      <div class="option">
+        <label>
+          <input type="checkbox" id="rxCheck" onchange="toggleRx()">
+          Add prescription lenses — +$${LENS_PRICE} CAD
+        </label>
+        <div class="rx-fields" id="rxFields">
+          <input placeholder="Sphere (OD)"><input placeholder="Sphere (OS)">
+          <input placeholder="Cylinder (OD)"><input placeholder="Cylinder (OS)">
+          <input placeholder="Axis (OD)"><input placeholder="Axis (OS)">
+          <input placeholder="Pupillary distance" style="grid-column:1/3">
+        </div>
+      </div>
+      <div class="total-row"><span>Total</span><strong id="totalPrice">$${FRAME_PRICE} CAD</strong></div>
+      <button class="add-btn" onclick="addToBag('${p.name}')">Add to bag</button>
+      <div class="confirm" id="confirmMsg">Added ${p.name} to your bag.</div>
+    </div>
+  `;
+}
+
+function toggleRx(){
+  const checked = document.getElementById("rxCheck").checked;
+  document.getElementById("rxFields").classList.toggle("show", checked);
+  const total = FRAME_PRICE + (checked ? LENS_PRICE : 0);
+  document.getElementById("totalPrice").textContent = `$${total} CAD`;
+}
+
+function addToBag(name){
+  const msg = document.getElementById("confirmMsg");
+  msg.style.display = "block";
+}
+
+function showList(){
+  history.replaceState(null, "", "#");
+  document.getElementById("listView").style.display = "block";
+  document.getElementById("detailView").classList.remove("active");
+  window.scrollTo(0,0);
+}
+
+function showDetail(id){
+  document.getElementById("listView").style.display = "none";
+  document.getElementById("detailView").classList.add("active");
+  renderDetail(id);
+  window.scrollTo(0,0);
+}
+
+function routeFromHash(){
+  const h = location.hash;
+  const m = h.match(/#p=(\d+)/);
+  if(m) showDetail(parseInt(m[1],10));
+  else showList();
+}
+window.addEventListener("hashchange", routeFromHash);
+routeFromHash();
+</script>
+</body>
+</html>
